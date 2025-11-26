@@ -6,10 +6,9 @@
 
 :root {
   --background: #090917;
-  --surface: #001233;
+  --surface: #001d3d;
   --accent: #00a1ff;
   --on-background: #ffffff;
-  --on-accent: #000000;
 }
 
 body {

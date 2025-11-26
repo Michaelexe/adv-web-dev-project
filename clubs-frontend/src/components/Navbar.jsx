@@ -33,10 +33,10 @@ function Navbar() {
   };
 
   return (
-    <nav className="navbar">
+    <nav className="navbar-login">
       <div className="navbar-container">
         <Link to="/dashboard" className="navbar-brand">
-          S.A.G.E.
+          S.A.G.E. <span style={{ color: "white" }}>Executives Portal</span>
         </Link>
 
         <div className="navbar-center">

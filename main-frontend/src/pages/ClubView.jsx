@@ -85,10 +85,18 @@ function ClubView() {
   return (
     <div className="page-container">
       <Navbar />
+      {/* Club banners are not used — banners are only for events. */}
       <div className="club-view-container">
         <div className="club-header-section">
           <div className="club-info-card">
             <div className="club-title-row">
+              {club.icon_url && (
+                <img
+                  src={club.icon_url}
+                  alt="club icon"
+                  className="club-icon-img"
+                />
+              )}
               <h1>{club.name}</h1>
               <span className="club-status-badge">
                 {club.status || "Active"}
@@ -182,31 +190,61 @@ function ClubView() {
               <div className="empty-state">No events scheduled</div>
             ) : (
               <div className="events-grid">
-                {events.map((event) => (
-                  <Link
-                    key={event.uid}
-                    to={`/event/${event.uid}`}
-                    className="event-card"
-                  >
-                    <div className="event-card-header">
-                      <h3>{event.name}</h3>
-                      <span className={`status-badge status-${event.status}`}>
-                        {event.status}
-                      </span>
+                {events.map((event) => {
+                  const isUpcoming = event.status === "upcoming";
+                  if (isUpcoming) {
+                    return (
+                      <Link
+                        key={event.uid}
+                        to={`/event/${event.uid}`}
+                        className="event-card"
+                      >
+                        <div className="event-card-header">
+                          <h3>{event.name}</h3>
+                          <span
+                            className={`status-badge status-${event.status}`}
+                          >
+                            {event.status}
+                          </span>
+                        </div>
+                        <div className="event-card-body">
+                          <p className="event-info">
+                            📅 {formatDateTime(event.start_datetime)}
+                          </p>
+                          <p className="event-info">
+                            📍 {event.location || "Location TBD"}
+                          </p>
+                          <p className="event-info">
+                            👥 {event.participant_count} participants
+                          </p>
+                        </div>
+                      </Link>
+                    );
+                  }
+
+                  return (
+                    <div key={event.uid} className="event-card disabled">
+                      <div className="event-card-header">
+                        <h3>{event.name}</h3>
+                        <span className={`status-badge status-${event.status}`}>
+                          {event.status}
+                        </span>
+                      </div>
+                      <div className="event-card-body">
+                        <p className="event-info">
+                          📅 {formatDateTime(event.start_datetime)}
+                        </p>
+                        <p className="event-info">
+                          📍 {event.location || "Location TBD"}
+                        </p>
+                        <p className="event-info">
+                          👥 {event.participant_count} participants
+                        </p>
+                      </div>
+                      <div className="status-overlay">{event.status}</div>
                     </div>
-                    <div className="event-card-body">
-                      <p className="event-info">
-                        📅 {formatDateTime(event.start_datetime)}
-                      </p>
-                      <p className="event-info">
-                        📍 {event.location || "Location TBD"}
-                      </p>
-                      <p className="event-info">
-                        👥 {event.participant_count} participants
-                      </p>
-                    </div>
-                  </Link>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>

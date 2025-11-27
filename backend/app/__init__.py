@@ -32,6 +32,9 @@ def create_app():
     app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret')
     # JWT config
     app.config['JWT_SECRET_KEY'] = os.environ.get('JWT_SECRET_KEY', app.config['SECRET_KEY'])
+    # Access token expiry: default to 1 day
+    from datetime import timedelta
+    app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(days=1)
 
     # Initialize extensions
     db.init_app(app)
@@ -45,12 +48,14 @@ def create_app():
     from .routes import events as events_bp
     from .routes import calendar as calendar_bp
     from .routes import comments as comments_bp
+    from .routes import media as media_bp
 
     app.register_blueprint(auth_bp.bp)
     app.register_blueprint(clubs_bp.bp)
     app.register_blueprint(events_bp.bp)
     app.register_blueprint(calendar_bp.bp)
     app.register_blueprint(comments_bp.bp)
+    app.register_blueprint(media_bp.bp)
 
     # Import models so they are registered with SQLAlchemy
     with app.app_context():

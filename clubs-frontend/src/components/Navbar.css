@@ -1,19 +1,7 @@
 .navbar {
-  background-color: rgba(255, 255, 255, 0.02);
-  border-bottom: 1px solid rgba(0, 161, 255, 0.3);
+  background-color: var(--surface);
   position: sticky;
   top: 0;
-  backdrop-filter: blur(10px);
-  z-index: 100;
-}
-
-.navbar-login {
-  background-color: rgba(255, 255, 255, 0.02);
-  background: #001d3d;
-  border-bottom: 1px solid rgba(0, 161, 255, 0.3);
-  position: sticky;
-  top: 0;
-  backdrop-filter: blur(10px);
   z-index: 100;
   padding: 16px 0;
 }

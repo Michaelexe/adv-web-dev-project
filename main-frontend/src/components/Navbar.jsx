@@ -25,6 +25,9 @@ function Navbar() {
               <Link to="/home" className="nav-link">
                 Home
               </Link>
+              <Link to="/settings" className="nav-link" aria-label="Settings">
+                Settings
+              </Link>
               <div className="navbar-user">
                 <span className="user-name">{user.name}</span>
                 <button onClick={handleLogout} className="btn-logout">

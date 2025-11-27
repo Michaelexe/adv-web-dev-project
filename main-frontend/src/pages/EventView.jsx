@@ -206,6 +206,16 @@ function EventView() {
     <div className="page-container">
       <Navbar />
       <div className="event-view-container">
+        {event.banner_url && (
+          <div
+            className="event-banner"
+            style={{
+              backgroundImage: `url(${event.banner_url})`,
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+            }}
+          />
+        )}
         <div className="event-details-section">
           <div className="event-header">
             <div className="event-title-section">
@@ -215,15 +225,33 @@ function EventView() {
               </span>
             </div>
 
-            {user && (
-              <button
-                onClick={handleJoin}
-                disabled={joining || joined}
-                className="btn-join-event"
-              >
-                {joined ? "✓ Joined" : joining ? "Joining..." : "Join Event"}
-              </button>
-            )}
+            {user &&
+              (() => {
+                const isUpcoming = event.status === "upcoming";
+                const disabled = joining || joined || !isUpcoming;
+                const label = joined
+                  ? "✓ Joined"
+                  : joining
+                  ? "Joining..."
+                  : !isUpcoming
+                  ? "Registration closed"
+                  : "Join Event";
+
+                return (
+                  <button
+                    onClick={handleJoin}
+                    disabled={disabled}
+                    className="btn-join-event"
+                    title={
+                      !isUpcoming
+                        ? "Sign-ups are only open for upcoming events"
+                        : ""
+                    }
+                  >
+                    {label}
+                  </button>
+                );
+              })()}
           </div>
 
           <div className="event-info-grid">

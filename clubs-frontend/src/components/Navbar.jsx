@@ -33,10 +33,10 @@ function Navbar() {
   };
 
   return (
-    <nav className="navbar-login">
+    <nav className="navbar">
       <div className="navbar-container">
         <Link to="/dashboard" className="navbar-brand">
-          S.A.G.E. <span style={{ color: "white" }}>Executives Portal</span>
+          S.A.G.E. <span>Executives Portal</span>
         </Link>
 
         <div className="navbar-center">
@@ -118,6 +118,9 @@ function Navbar() {
           </Link>
           <Link to="/events" className="nav-link">
             Events
+          </Link>
+          <Link to="/settings" className="nav-link" aria-label="Settings">
+            Settings
           </Link>
           <button onClick={handleLogout} className="btn-logout">
             Logout

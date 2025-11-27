@@ -1,8 +1,6 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
-// import "./NavbarHome.css";
-import "../../../main-frontend/src/components/Navbar.css";
 
 function NavbarHome() {
   const { user, logout } = useAuth();
@@ -15,7 +13,7 @@ function NavbarHome() {
 
   return (
     <nav className="navbar">
-      <div className="navbar-content">
+      <div className="navbar-container">
         <Link to={user ? "/home" : "/"} className="navbar-brand">
           S.A.G.E. <span style={{ color: "white" }}>Executives Portal</span>
         </Link>
@@ -38,7 +36,7 @@ function NavbarHome() {
               <Link to="/login" className="nav-link">
                 Login
               </Link>
-              <Link to="/register" className="btn-register">
+              <Link to="/register" className="btn-primary">
                 Sign Up
               </Link>
             </>

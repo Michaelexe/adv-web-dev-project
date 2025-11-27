@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from .. import db
-from ..models import Club, ClubMember, User
+from ..models import Club, ClubMember, User, Event, EventParticipant
 from datetime import datetime
 
 bp = Blueprint('clubs', __name__, url_prefix='/clubs')
@@ -25,7 +25,8 @@ def list_clubs():
             'budget': str(club.budget),
             'social_links': club.social_links,
             'status': club.status,
-            'member_count': member_count
+            'member_count': member_count,
+            'icon_url': club.icon_url,
         })
     return jsonify(result), 200
 
@@ -37,11 +38,12 @@ def create_club():
     name = data.get('name')
     description = data.get('description')
     budget = data.get('budget', 500)
+    icon_url = data.get('icon_url')
     social_links = data.get('social_links')
     if not name:
         return jsonify({'msg': 'name required'}), 400
 
-    club = Club(name=name, description=description, budget=budget, social_links=social_links)
+    club = Club(name=name, description=description, budget=budget, social_links=social_links, icon_url=icon_url)
     db.session.add(club)
     db.session.commit()
 
@@ -59,7 +61,7 @@ def get_club(club_uid):
     club = Club.query.get(club_uid)
     if not club:
         return jsonify({'msg': 'club not found'}), 404
-    return jsonify({'uid': club.uid, 'name': club.name, 'description': club.description, 'budget': str(club.budget), 'social_links': club.social_links}), 200
+    return jsonify({'uid': club.uid, 'name': club.name, 'description': club.description, 'budget': str(club.budget), 'social_links': club.social_links, 'icon_url': club.icon_url}), 200
 
 
 @bp.route('/<club_uid>', methods=['PUT'])
@@ -77,6 +79,8 @@ def update_club(club_uid):
     club.description = data.get('description', club.description)
     club.budget = data.get('budget', club.budget)
     club.social_links = data.get('social_links', club.social_links)
+    if 'icon_url' in data:
+        club.icon_url = data.get('icon_url')
     db.session.commit()
     return jsonify({'msg': 'updated'}), 200
 
@@ -110,6 +114,65 @@ def club_members(club_uid):
     return jsonify(out), 200
 
 
+@bp.route('/<club_uid>/stats', methods=['GET'])
+def club_stats(club_uid):
+    """Return aggregated statistics for a club useful for dashboards/charts."""
+    club = Club.query.get(club_uid)
+    if not club:
+        return jsonify({'msg': 'club not found'}), 404
+
+    # Total members and execs
+    total_members = ClubMember.query.filter_by(club_uid=club_uid).count()
+    exec_count = ClubMember.query.filter_by(club_uid=club_uid, type='exec').count()
+
+    # Members joined per day for the last 30 days
+    from datetime import datetime, timedelta
+
+    today = datetime.utcnow().date()
+    days = []
+    members_by_day = []
+    for i in range(29, -1, -1):
+        d = today - timedelta(days=i)
+        days.append(d.isoformat())
+        count = ClubMember.query.filter(
+            ClubMember.club_uid == club_uid,
+            db.func.date(ClubMember.joined_at) == d
+        ).count()
+        members_by_day.append({'date': d.isoformat(), 'count': count})
+
+    # Recent events and attendance
+    events = Event.query.filter_by(club_uid=club_uid).order_by(Event.start_datetime.desc()).limit(10).all()
+    recent_events = []
+    attendance_by_event = []
+    event_type_counts = {}
+    upcoming_events_count = Event.query.filter(Event.club_uid == club_uid, Event.start_datetime >= datetime.utcnow()).count()
+
+    for e in events:
+        participant_count = EventParticipant.query.filter_by(event_uid=e.uid).count()
+        recent_events.append({
+            'uid': e.uid,
+            'name': e.name,
+            'start_datetime': e.start_datetime.isoformat() if e.start_datetime else None,
+            'participant_count': participant_count
+        })
+        attendance_by_event.append({'name': e.name, 'count': participant_count})
+        event_type_counts[e.type] = event_type_counts.get(e.type, 0) + 1
+
+    stats = {
+        'club_uid': club_uid,
+        'club_name': club.name,
+        'total_members': total_members,
+        'exec_count': exec_count,
+        'members_by_day': members_by_day,
+        'recent_events': recent_events,
+        'attendance_by_event': attendance_by_event,
+        'event_type_counts': event_type_counts,
+        'upcoming_events_count': upcoming_events_count,
+    }
+
+    return jsonify(stats), 200
+
+
 @bp.route('/my-clubs', methods=['GET'])
 @jwt_required()
 def get_my_clubs():
@@ -125,7 +188,8 @@ def get_my_clubs():
                 'uid': club.uid,
                 'name': club.name,
                 'role': membership.role,
-                'budget': str(club.budget)
+                'budget': str(club.budget),
+                'icon_url': club.icon_url,
             })
     
     return jsonify(clubs), 200

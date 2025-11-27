@@ -1,11 +1,77 @@
 :root {
+  /* Default (keeps current dark look if no palette class is applied) */
   --background: #090917;
   --surface: #001d3d;
   --accent: #00a1ff;
   --on-background: #ffffff;
+  --on-accent: #ffffff;
+  --muted: #94a3b8;
+  --success: #22c55e;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  --card-bg: rgba(255, 255, 255, 0.03);
 
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* Palette classes: attach `palette-<name>` to <html> to switch */
+.palette-dark {
+  --background: #090917;
+  --surface: #001d3d;
+  --accent: #00a1ff;
+  --on-background: #ffffff;
+  --on-accent: #ffffff;
+  --muted: #94a3b8;
+  --success: #22c55e;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  --card-bg: rgba(255, 255, 255, 0.03);
+}
+
+.palette-light {
+  --background: #f8fafc;
+  --surface: #ffffff;
+  --accent: #0ea5e9;
+  --on-background: #0b1220;
+  --on-accent: #ffffff;
+  --muted: #475569;
+  --success: #059669;
+  --warning: #b45309;
+  --danger: #b91c1c;
+  --card-bg: rgba(2, 6, 23, 0.04);
+}
+
+.palette-ocean {
+  --background: #e6fbff;
+  --surface: #dff6fb;
+  --accent: #0077b6;
+  --on-background: #01303f;
+  --on-accent: #ffffff;
+  --muted: #2b6f7f;
+  --success: #2dd4bf;
+  --warning: #ffb703;
+  --danger: #ef4444;
+  --card-bg: rgba(1, 48, 63, 0.04);
+}
+
+.palette-sunset {
+  --background: #fff7ed;
+  --surface: #fff1e6;
+  --accent: #ff6b6b;
+  --on-background: #2b2b2b;
+  --on-accent: #ffffff;
+  --muted: #6b6b6b;
+  --success: #16a34a;
+  --warning: #f97316;
+  --danger: #e11d48;
+  --card-bg: rgba(255, 255, 255, 0.6);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  :root {
+    transition: background-color 220ms ease, color 220ms ease;
+  }
 }
 
 * {

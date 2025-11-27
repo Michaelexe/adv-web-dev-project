@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { clubAPI } from "../services/api";
+import { clubAPI, mediaAPI } from "../services/api";
 import Navbar from "../components/Navbar";
 import "../pages/CreateClub.css";
 
@@ -12,6 +12,8 @@ function EditClub() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(true);
+  const [iconFile, setIconFile] = useState(null);
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -20,6 +22,8 @@ function EditClub() {
         const response = await clubAPI.get(clubUid);
         setName(response.data.name);
         setBudget(response.data.budget);
+        setIconFile(null);
+        setBannerFile(null);
         if (response.data.social_links) {
           setSocialLinks(JSON.stringify(response.data.social_links, null, 2));
         }
@@ -55,6 +59,12 @@ function EditClub() {
         budget: parseFloat(budget) || 0,
         social_links: parsedLinks,
       };
+
+      // upload any new files (icons use 'logo' preset)
+      if (iconFile) {
+        const up = await mediaAPI.upload(iconFile, "logo");
+        data.icon_url = up.data.url;
+      }
 
       await clubAPI.update(clubUid, data);
       navigate("/clubs");

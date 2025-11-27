@@ -21,7 +21,13 @@ def get_all_events():
         if event.club_uid:
             club = Club.query.get(event.club_uid)
             club_name = club.name if club else None
-        
+        # Compute simple status: 'completed' if event ended in the past, otherwise 'upcoming'
+        now = datetime.utcnow()
+        if event.end_datetime and event.end_datetime < now:
+            computed_status = 'completed'
+        else:
+            computed_status = 'upcoming'
+
         result.append({
             'uid': event.uid,
             'name': event.name,
@@ -31,10 +37,11 @@ def get_all_events():
             'location': event.location,
             'limit': event.limit,
             'type': event.type,
-            'status': event.status,
+            'status': computed_status,
             'club_uid': event.club_uid,
             'club_name': club_name,
-            'participant_count': participant_count
+            'participant_count': participant_count,
+            'banner_url': event.banner_url
         })
     return jsonify(result), 200
 
@@ -49,6 +56,7 @@ def create_event():
     event_type = data.get('type')
     status = data.get('status', 'scheduled')
     club_uid = data.get('club_uid')
+    banner_url = data.get('banner_url')
 
     if not name or not start or not event_type:
         return jsonify({'msg': 'name, start_datetime and type are required'}), 400
@@ -68,7 +76,7 @@ def create_event():
     except Exception:
         return jsonify({'msg': 'invalid datetime format, use ISO format'}), 400
 
-    event = Event(name=name, start_datetime=start_dt, end_datetime=end_dt, description=data.get('description'), location=data.get('location'), limit=data.get('limit'), type=event_type, status=status, club_uid=club_uid)
+    event = Event(name=name, start_datetime=start_dt, end_datetime=end_dt, description=data.get('description'), location=data.get('location'), limit=data.get('limit'), type=event_type, status=status, club_uid=club_uid, banner_url=banner_url)
     db.session.add(event)
     db.session.commit()
     return jsonify({'uid': event.uid, 'name': event.name}), 201
@@ -79,7 +87,22 @@ def get_event(event_uid):
     event = Event.query.get(event_uid)
     if not event:
         return jsonify({'msg': 'event not found'}), 404
-    return jsonify({'uid': event.uid, 'name': event.name, 'start_datetime': event.start_datetime.isoformat(), 'end_datetime': event.end_datetime.isoformat() if event.end_datetime else None, 'description': event.description, 'location': event.location, 'limit': event.limit, 'type': event.type, 'status': event.status, 'club_uid': event.club_uid}), 200
+    club_name = None
+    club_icon = None
+    if event.club_uid:
+        c = Club.query.get(event.club_uid)
+        if c:
+            club_name = c.name
+            club_icon = c.icon_url
+
+    # Compute status for this event
+    now = datetime.utcnow()
+    if event.end_datetime and event.end_datetime < now:
+        computed_status = 'completed'
+    else:
+        computed_status = 'upcoming'
+
+    return jsonify({'uid': event.uid, 'name': event.name, 'start_datetime': event.start_datetime.isoformat(), 'end_datetime': event.end_datetime.isoformat() if event.end_datetime else None, 'description': event.description, 'location': event.location, 'limit': event.limit, 'type': event.type, 'status': computed_status, 'club_uid': event.club_uid, 'club_name': club_name, 'club_icon': club_icon, 'banner_url': event.banner_url}), 200
 
 
 @bp.route('/<event_uid>', methods=['PUT'])
@@ -109,6 +132,8 @@ def update_event(event_uid):
     for fld in ('description', 'location', 'limit', 'type', 'status'):
         if fld in data:
             setattr(event, fld, data.get(fld))
+    if 'banner_url' in data:
+        event.banner_url = data.get('banner_url')
     db.session.commit()
     return jsonify({'msg': 'updated'}), 200
 
@@ -130,6 +155,11 @@ def join_event(event_uid):
     existing = EventParticipant.query.filter_by(user_uid=uid, event_uid=event_uid).first()
     if existing:
         return jsonify({'msg': 'already joined'}), 400
+
+    # Only allow joining if event is upcoming
+    now = datetime.utcnow()
+    if event.end_datetime and event.end_datetime < now:
+        return jsonify({'msg': 'cannot join a completed event'}), 403
 
     participant = EventParticipant(user_uid=uid, event_uid=event_uid, type='inperson' if event.type == 'in-person' else 'online')
     db.session.add(participant)
@@ -180,7 +210,8 @@ def get_club_events(club_uid):
             'type': event.type,
             'status': event.status,
             'club_uid': event.club_uid,
-            'participant_count': participant_count
+            'participant_count': participant_count,
+            'banner_url': event.banner_url
         })
     
     return jsonify(result), 200

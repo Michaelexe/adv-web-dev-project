@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { clubAPI } from "../services/api";
+import { clubAPI, mediaAPI } from "../services/api";
 import { useClub } from "../contexts/ClubContext";
 import Navbar from "../components/Navbar";
 import "./CreateClub.css";
@@ -9,6 +9,8 @@ function CreateClub() {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [socialLinks, setSocialLinks] = useState([{ key: "", value: "" }]);
+  const [iconFile, setIconFile] = useState(null);
+
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const { fetchMyClubs } = useClub();
@@ -49,6 +51,12 @@ function CreateClub() {
         social_links:
           Object.keys(socialLinksObj).length > 0 ? socialLinksObj : null,
       };
+
+      // Upload files first if provided (icons use 'logo' preset)
+      if (iconFile) {
+        const up = await mediaAPI.upload(iconFile, "logo");
+        data.icon_url = up.data.url;
+      }
 
       const response = await clubAPI.create(data);
       // Refresh clubs list
@@ -137,6 +145,20 @@ function CreateClub() {
                 </button>
               </div>
             </div>
+
+            <div className="form-group">
+              <label>Club Icon</label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => setIconFile(e.target.files[0])}
+              />
+              <span className="form-hint">
+                Square icon recommended (256x256)
+              </span>
+            </div>
+
+            {/* Club banners removed - banners are event-only */}
 
             {error && <div className="error-message">{error}</div>}
 

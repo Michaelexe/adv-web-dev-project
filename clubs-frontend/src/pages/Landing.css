@@ -47,14 +47,13 @@
 
 .features {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  grid-template-columns: 1fr 1fr 1fr;
   gap: 32px;
   margin-bottom: 60px;
 }
 
 .feature {
-  background-color: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(0, 161, 255, 0.3);
+  background-color: var(--surface);
   border-radius: 16px;
   padding: 32px 24px;
   transition: all 0.3s ease;
@@ -67,9 +66,7 @@
 }
 
 .feature-icon {
-  font-size: 48px;
-  display: block;
-  margin-bottom: 16px;
+  color: var(--accent);
 }
 
 .feature h3 {
@@ -114,7 +111,6 @@
 .btn-primary-large:hover {
   background-color: #0088d4;
   transform: translateY(-4px);
-  box-shadow: 0 8px 24px rgba(0, 161, 255, 0.4);
 }
 
 .btn-secondary-large {
@@ -132,9 +128,6 @@
 .landing-footer {
   font-size: 14px;
   color: rgba(255, 255, 255, 0.5);
-}
-.accent-text {
-  color: var(--accent);
 }
 
 @media (max-width: 768px) {

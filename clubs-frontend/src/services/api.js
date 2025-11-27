@@ -33,6 +33,7 @@ export const clubAPI = {
   join: (uid) => api.post(`/clubs/${uid}/join`),
   getMembers: (uid) => api.get(`/clubs/${uid}/members`),
   getMyClubs: () => api.get("/clubs/my-clubs"),
+  getStats: (uid) => api.get(`/clubs/${uid}/stats`),
 };
 
 // Event endpoints
@@ -43,6 +44,18 @@ export const eventAPI = {
   join: (uid) => api.post(`/events/${uid}/join`),
   getClubEvents: (clubUid) => api.get(`/events/club/${clubUid}`),
   delete: (uid) => api.delete(`/events/${uid}`),
+};
+
+// Media endpoints
+export const mediaAPI = {
+  upload: (file, presetType) => {
+    const fd = new FormData();
+    fd.append("file", file);
+    if (presetType) fd.append("preset_type", presetType);
+    return api.post("/media/upload", fd, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+  },
 };
 
 export default api;

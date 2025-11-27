@@ -4,6 +4,8 @@
   padding: 40px 32px;
 }
 
+/* Club banners removed (banners are event-only) */
+
 .club-header-section {
   display: grid;
   grid-template-columns: 3fr 1fr;
@@ -23,6 +25,14 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 16px;
+}
+
+.club-icon-img {
+  width: 64px;
+  height: 64px;
+  border-radius: 12px;
+  object-fit: cover;
+  margin-right: 12px;
 }
 
 .club-title-row h1 {
@@ -156,6 +166,26 @@
 .event-card:hover {
   border-color: var(--accent);
   transform: translateX(4px);
+}
+
+.event-card.disabled {
+  opacity: 0.65;
+  cursor: default;
+  pointer-events: none;
+  transform: none;
+  position: relative;
+}
+
+.status-overlay {
+  position: absolute;
+  right: 12px;
+  top: 12px;
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  padding: 6px 10px;
+  border-radius: 12px;
+  font-weight: 700;
+  text-transform: capitalize;
 }
 
 .event-card-header {

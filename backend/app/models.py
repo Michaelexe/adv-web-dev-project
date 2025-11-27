@@ -35,6 +35,8 @@ class Club(db.Model):
 	name = db.Column(db.String(255), nullable=False)
 	description = db.Column(db.Text, nullable=True)
 	budget = db.Column(db.Numeric(12, 2), nullable=False, default=500)
+	# Optional media
+	icon_url = db.Column(db.String(1024), nullable=True)
 	# store social media links as JSON: {"twitter": "...", "facebook": "..."}
 	social_links = db.Column(db.JSON, nullable=True)
 	status = db.Column(db.String(50), nullable=False, default='Approved')
@@ -73,6 +75,9 @@ class Event(db.Model):
 	limit = db.Column(db.Integer, nullable=True)
 	type = db.Column(db.String(50), nullable=False)  # 'in-person' or 'online'
 	status = db.Column(db.String(50), nullable=False, default='scheduled')
+
+	# Optional media
+	banner_url = db.Column(db.String(1024), nullable=True)
 
 	participants = db.relationship('EventParticipant', back_populates='event', cascade='all, delete-orphan')
 

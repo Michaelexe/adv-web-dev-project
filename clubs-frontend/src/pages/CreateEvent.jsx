@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { eventAPI } from "../services/api";
+import { eventAPI, mediaAPI } from "../services/api";
 import { useClub } from "../contexts/ClubContext";
 import Navbar from "../components/Navbar";
 import "./CreateEvent.css";
@@ -42,6 +42,7 @@ function CreateEvent() {
   const [status, setStatus] = useState("scheduled");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [bannerFile, setBannerFile] = useState(null);
   const [heatmapData, setHeatmapData] = useState(generateDummyHeatmapData());
   const navigate = useNavigate();
   const { selectedClub } = useClub();
@@ -73,6 +74,12 @@ function CreateEvent() {
         status,
         club_uid: selectedClub?.uid || null,
       };
+
+      // Event only uses a banner; upload with 'banner' preset
+      if (bannerFile) {
+        const up = await mediaAPI.upload(bannerFile, "banner");
+        data.banner_url = up.data.url;
+      }
 
       const response = await eventAPI.create(data);
       navigate("/dashboard");
@@ -195,6 +202,18 @@ function CreateEvent() {
                     placeholder="Describe your event..."
                     rows="4"
                   />
+                </div>
+
+                <div className="form-group">
+                  <label>Event Banner</label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => setBannerFile(e.target.files[0])}
+                  />
+                  <span className="form-hint">
+                    Wide banner recommended (1200x400)
+                  </span>
                 </div>
 
                 {error && <div className="error-message">{error}</div>}

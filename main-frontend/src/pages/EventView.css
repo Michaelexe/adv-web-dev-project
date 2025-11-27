@@ -4,6 +4,27 @@
   padding: 40px 32px;
 }
 
+.event-banner {
+  width: 100%;
+  /* fallback padding (height percentage) for older browsers — default for 16:5 ratio */
+  padding-top: 31.25%;
+  border-radius: 12px;
+  margin: 16px auto;
+  max-width: 1000px;
+  background-size: cover;
+  background-position: center;
+  overflow: hidden;
+}
+
+/* Use aspect-ratio in modern browsers and remove fallback padding */
+@supports (aspect-ratio: 1/1) {
+  .event-banner {
+    aspect-ratio: 16/5; /* width / height */
+    padding-top: 0;
+    height: auto;
+  }
+}
+
 .event-details-section {
   background-color: var(--surface);
   border: 1px solid rgba(0, 161, 255, 0.3);

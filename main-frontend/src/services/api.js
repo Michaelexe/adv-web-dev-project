@@ -1,9 +1,13 @@
 import axios from "axios";
 
-const BASE_URL = "http://127.0.0.1:5000";
+const PRODUCTION_BASE_URL = "https://sage-production-85bc.up.railway.app";
+const DEVELOPMENT_BASE_URL = "http://127.0.0.1:5000";
 
 const api = axios.create({
-  baseURL: BASE_URL,
+  baseURL:
+    process.env.NODE_ENV === "production"
+      ? PRODUCTION_BASE_URL
+      : DEVELOPMENT_BASE_URL,
   headers: {
     "Content-Type": "application/json",
   },

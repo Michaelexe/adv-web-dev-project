@@ -37,6 +37,10 @@
   height: fit-content;
 }
 
+.club-header-content {
+  width: 100%;
+}
+
 .club-header {
   display: flex;
   flex-direction: column;

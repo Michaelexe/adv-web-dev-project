@@ -58,6 +58,8 @@ function Dashboard() {
         setClubData(clubResponse.data);
         setMembers(membersResponse.data);
         setEvents(eventsResponse.data);
+        console.log(eventsResponse.data);
+
         setStats(statsResponse.data);
       } catch (err) {
         console.error("Failed to fetch club details:", err);
@@ -101,8 +103,6 @@ function Dashboard() {
 
   const execMembers = members.filter((m) => m.type === "exec");
   const generalMembers = members.filter((m) => m.type === "member");
-
-  const upcomingEvents = events.filter((e) => e.status === "upcoming");
 
   // Prepare chart data if stats available
   const membersGrowthData = stats
@@ -183,7 +183,7 @@ function Dashboard() {
             </div>
 
             <div className="events-grid">
-              {upcomingEvents.length === 0 ? (
+              {events.length === 0 ? (
                 <div className="no-events-placeholder surface">
                   <h3>No Upcoming Events</h3>
                   <p style={{ color: "var(--muted)", marginTop: 8 }}>
@@ -197,7 +197,7 @@ function Dashboard() {
                   </div>
                 </div>
               ) : (
-                upcomingEvents.map((event) => {
+                events.map((event) => {
                   return (
                     <div key={event.uid} className={`event-card surface ${""}`}>
                       <div

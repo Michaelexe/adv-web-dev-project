@@ -40,7 +40,7 @@ def create_app():
     db.init_app(app)
     migrate.init_app(app, db)
     jwt.init_app(app)
-    cors.init_app(app, resources={r"/*": {"origins": ["http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:5174", "http://127.0.0.1:5174", "https://sage-clubs.vercel.app", "https://sage-main.vercel.app/"]}}, supports_credentials=True)
+    cors.init_app(app, resources={r"/*": {"origins": ["http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:5174", "http://127.0.0.1:5174", "https://sage-clubs.vercel.app", "https://sage-main.vercel.app"]}}, supports_credentials=True)
 
     # Register blueprints
     from .routes import auth as auth_bp

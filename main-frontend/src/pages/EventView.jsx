@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { eventAPI, commentAPI } from "../services/api";
 import { useAuth } from "../contexts/AuthContext";
 import Navbar from "../components/Navbar";
@@ -7,6 +7,7 @@ import "./EventView.css";
 
 function EventView() {
   const { eventUid } = useParams();
+  const navigate = useNavigate();
   const { user } = useAuth();
   const [event, setEvent] = useState(null);
   const [comments, setComments] = useState([]);
@@ -121,17 +122,26 @@ function EventView() {
   };
 
   const formatCommentTime = (isoString) => {
-    const date = new Date(isoString);
+    // If the ISO string doesn't end with 'Z', append it to treat as UTC
+    const utcString = isoString.endsWith("Z") ? isoString : isoString + "Z";
+    const date = new Date(utcString);
     const now = new Date();
     const diffMs = now - date;
-    const diffMins = Math.floor(diffMs / 60000);
+    const diffSecs = Math.floor(diffMs / 1000);
+    const diffMins = Math.floor(diffSecs / 60);
     const diffHours = Math.floor(diffMins / 60);
     const diffDays = Math.floor(diffHours / 24);
 
-    if (diffMins < 1) return "Just now";
-    if (diffMins < 60) return `${diffMins}m ago`;
-    if (diffHours < 24) return `${diffHours}h ago`;
-    if (diffDays < 7) return `${diffDays}d ago`;
+    // Handle negative time (future dates or invalid data)
+    if (diffMs < 0 || diffSecs < 0) return "Just now";
+
+    if (diffMins < 1) return `${diffSecs} s ago`;
+    if (diffHours < 1) return `${diffMins} min ago`;
+    if (diffHours < 24) {
+      const remainingMins = diffMins % 60;
+      return `${diffHours} hr ${remainingMins} min ago`;
+    }
+    if (diffDays < 7) return `${diffDays} day${diffDays > 1 ? "s" : ""} ago`;
     return date.toLocaleDateString();
   };
 
@@ -211,6 +221,9 @@ function EventView() {
     <div className="page-container">
       <Navbar />
       <div className="event-view-container">
+        <button onClick={() => navigate(-1)} className="btn-back">
+          ← Back
+        </button>
         {event.banner_url && (
           <div
             className="event-banner"

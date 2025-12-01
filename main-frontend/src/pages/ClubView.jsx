@@ -13,6 +13,7 @@ function ClubView() {
   const [loading, setLoading] = useState(true);
   const [joining, setJoining] = useState(false);
   const [isMember, setIsMember] = useState(false);
+  const [joiningEvent, setJoiningEvent] = useState(null);
 
   useEffect(() => {
     fetchClubData();
@@ -70,6 +71,30 @@ function ClubView() {
       );
     } finally {
       setJoining(false);
+    }
+  };
+
+  const handleEventJoinLeave = async (event) => {
+    setJoiningEvent(event.uid);
+    try {
+      if (event.is_attending) {
+        await eventAPI.leave(event.uid);
+      } else {
+        await eventAPI.join(event.uid);
+      }
+      // Update the events array
+      setEvents(
+        events.map((e) =>
+          e.uid === event.uid ? { ...e, is_attending: !e.is_attending } : e
+        )
+      );
+    } catch (err) {
+      alert(
+        err.response?.data?.msg ||
+          `Failed to ${event.is_attending ? "leave" : "join"} event`
+      );
+    } finally {
+      setJoiningEvent(null);
     }
   };
 
@@ -226,38 +251,55 @@ function ClubView() {
 
                   if (isUpcoming) {
                     return (
-                      <Link
-                        key={event.uid}
-                        to={`/event/${event.uid}`}
-                        className="event-card"
-                      >
-                        <div className="event-card-header">
-                          <h3>{event.name}</h3>
-                          <div className="status-badges">
-                            <span
-                              className={`status-badge status-${event.status}`}
-                            >
-                              {event.status}
-                            </span>
-                            {isAttending && (
-                              <span className="status-badge status-attending">
-                                Attending
+                      <div key={event.uid} className="event-card-wrapper">
+                        <Link
+                          to={`/event/${event.uid}`}
+                          className="event-card"
+                        >
+                          <div className="event-card-header">
+                            <h3>{event.name}</h3>
+                            <div className="status-badges">
+                              <span
+                                className={`status-badge status-${event.status}`}
+                              >
+                                {event.status}
                               </span>
-                            )}
+                              {isAttending && (
+                                <span className="status-badge status-attending">
+                                  Attending
+                                </span>
+                              )}
+                            </div>
                           </div>
-                        </div>
-                        <div className="event-card-body">
-                          <p className="event-info">
-                            📅 {formatDateTime(event.start_datetime)}
-                          </p>
-                          <p className="event-info">
-                            📍 {event.location || "Location TBD"}
-                          </p>
-                          <p className="event-info">
-                            👥 {event.participant_count} participants
-                          </p>
-                        </div>
-                      </Link>
+                          <div className="event-card-body">
+                            <p className="event-info">
+                              📅 {formatDateTime(event.start_datetime)}
+                            </p>
+                            <p className="event-info">
+                              📍 {event.location || "Location TBD"}
+                            </p>
+                            <p className="event-info">
+                              👥 {event.participant_count} participants
+                            </p>
+                          </div>
+                        </Link>
+                        <button
+                          className={`btn-join-event ${
+                            isAttending ? "joined" : ""
+                          }`}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            handleEventJoinLeave(event);
+                          }}
+                          disabled={joiningEvent === event.uid}
+                        >
+                          {joiningEvent === event.uid
+                            ? "Processing..."
+                            : isAttending
+                            ? "✓ Registered"
+                            : "Join Event"}
+                        </button>
+                      </div>
                     );
                   }
 

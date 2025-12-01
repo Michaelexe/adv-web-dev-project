@@ -4,6 +4,28 @@
   padding: 40px 32px;
 }
 
+.btn-back {
+  background-color: var(--surface);
+  color: var(--on-background);
+  border: 1px solid var(--accent);
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-bottom: 24px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-back:hover {
+  background-color: var(--accent);
+  color: var(--on-accent);
+  transform: translateX(-2px);
+}
+
 .event-banner {
   width: 100%;
   /* fallback padding (height percentage) for older browsers — default for 16:5 ratio */
@@ -246,7 +268,7 @@
 }
 
 .btn-reply:hover {
-  color: #0088cc;
+  color: color-mix(in srgb, var(--accent) 75%, black 25%);
 }
 
 .reply-form {

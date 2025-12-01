@@ -26,7 +26,7 @@
   background-color: var(--surface);
   border-radius: 16px;
   padding: 32px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--accent) 30%, transparent);
 }
 
 .heatmap-container h2 {
@@ -128,7 +128,7 @@
 .heatmap-cell:hover {
   transform: scale(1.05);
   border-color: var(--accent);
-  box-shadow: 0 2px 8px rgba(0, 161, 255, 0.3);
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--accent) 30%, transparent);
   z-index: 10;
 }
 
@@ -171,7 +171,7 @@
 .form-group select:focus {
   outline: none;
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(0, 161, 255, 0.1);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 10%, transparent);
 }
 
 .form-group select option {

@@ -114,9 +114,9 @@ body {
 }
 
 .btn-primary:hover {
-  background-color: var(--accent);
+  background-color: color-mix(in srgb, var(--accent) 75%, black 25%);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 161, 255, 0.3);
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--accent) 30%, transparent);
 }
 
 .btn-primary:disabled {

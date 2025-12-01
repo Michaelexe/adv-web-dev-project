@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useTheme, PALETTES } from "../contexts/ThemeContext";
 import { useClub } from "../contexts/ClubContext";
+import { useAuth } from "../contexts/AuthContext";
 import Navbar from "../components/Navbar";
 import { clubAPI } from "../services/api";
 import "./Settings.css";
@@ -17,6 +18,7 @@ const LABELS = {
 export default function Settings() {
   const { palette, setPalette } = useTheme();
   const { selectedClub } = useClub();
+  const { user } = useAuth();
   const [members, setMembers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [newExecEmail, setNewExecEmail] = useState("");
@@ -93,6 +95,13 @@ export default function Settings() {
   const execs = members.filter((m) => m.type === "exec");
   const founder = execs.find((m) => m.role === "founder");
 
+  // Check if current user is founder or president
+  const currentUserExec = execs.find((m) => m.user_uid === user?.uid);
+  const canManageExecs =
+    currentUserExec &&
+    (currentUserExec.role === "founder" ||
+      currentUserExec.role.toLowerCase() === "president");
+
   return (
     <div className="page-container">
       <Navbar />
@@ -130,6 +139,7 @@ export default function Settings() {
                       onChange={(e) => setNewExecEmail(e.target.value)}
                       className="input-exec-email"
                       required
+                      disabled={!canManageExecs}
                     />
                     <input
                       type="text"
@@ -138,15 +148,21 @@ export default function Settings() {
                       onChange={(e) => setNewExecRole(e.target.value)}
                       className="input-exec-role"
                       required
+                      disabled={!canManageExecs}
                     />
                     <button
                       type="submit"
-                      disabled={adding}
+                      disabled={adding || !canManageExecs}
                       className="btn-add-exec"
                     >
                       {adding ? "Adding..." : "Add Executive"}
                     </button>
                   </form>
+                  {!canManageExecs && (
+                    <p className="permission-notice">
+                      Only the founder and president can add executives.
+                    </p>
+                  )}
                 </div>
               </div>
 
@@ -184,14 +200,16 @@ export default function Settings() {
                                   </span>
                                   <span className="exec-role">{exec.role}</span>
                                 </div>
-                                <button
-                                  onClick={() =>
-                                    handleRemoveExec(exec.user_uid)
-                                  }
-                                  className="btn-remove-exec"
-                                >
-                                  Remove
-                                </button>
+                                {canManageExecs && (
+                                  <button
+                                    onClick={() =>
+                                      handleRemoveExec(exec.user_uid)
+                                    }
+                                    className="btn-remove-exec"
+                                  >
+                                    Remove
+                                  </button>
+                                )}
                               </div>
                             ))}
                         </div>

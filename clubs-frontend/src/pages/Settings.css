@@ -200,6 +200,13 @@
   transition: all 0.3s ease;
 }
 
+.input-exec-email:disabled,
+.input-exec-role:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background-color: color-mix(in srgb, var(--background) 80%, var(--muted) 20%);
+}
+
 .input-exec-email:focus,
 .input-exec-role:focus {
   outline: none;
@@ -224,7 +231,7 @@
   transition: all 0.3s ease;
 }
 
-.btn-add-exec:hover {
+.btn-add-exec:hover:not(:disabled) {
   background-color: color-mix(in srgb, var(--accent) 75%, black 25%);
 }
 
@@ -237,4 +244,11 @@
   color: var(--muted);
   font-style: italic;
   margin: 16px 0;
+}
+
+.permission-notice {
+  color: var(--muted);
+  font-size: 13px;
+  margin-top: 12px;
+  font-style: italic;
 }

@@ -38,6 +38,8 @@ export const clubAPI = {
   getMembers: (uid) => api.get(`/clubs/${uid}/members`),
   getMyClubs: () => api.get("/clubs/my-clubs"),
   getStats: (uid) => api.get(`/clubs/${uid}/stats`),
+  addExec: (uid, data) => api.post(`/clubs/${uid}/execs`, data),
+  removeExec: (uid, userUid) => api.delete(`/clubs/${uid}/execs/${userUid}`),
 };
 
 // Event endpoints

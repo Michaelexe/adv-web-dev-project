@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useTheme, PALETTES } from "../contexts/ThemeContext";
 import { useClub } from "../contexts/ClubContext";
 import Navbar from "../components/Navbar";
-import axios from "axios";
+import { clubAPI } from "../services/api";
 import "./Settings.css";
 
 const LABELS = {
@@ -31,9 +31,7 @@ export default function Settings() {
 
   const fetchMembers = async () => {
     try {
-      const response = await axios.get(
-        `http://localhost:5000/clubs/${selectedClub.uid}/members`
-      );
+      const response = await clubAPI.getMembers(selectedClub.uid);
       setMembers(response.data || []);
     } catch (err) {
       console.error("Failed to fetch members:", err);
@@ -65,17 +63,10 @@ export default function Settings() {
 
     setAdding(true);
     try {
-      const token = localStorage.getItem("token");
-      await axios.post(
-        `http://localhost:5000/clubs/${selectedClub.uid}/execs`,
-        {
-          email: newExecEmail.trim(),
-          role: newExecRole.trim(),
-        },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+      await clubAPI.addExec(selectedClub.uid, {
+        email: newExecEmail.trim(),
+        role: newExecRole.trim(),
+      });
       alert("Executive added successfully");
       setNewExecEmail("");
       setNewExecRole("");
@@ -91,13 +82,7 @@ export default function Settings() {
     if (!confirm("Are you sure you want to remove this executive?")) return;
 
     try {
-      const token = localStorage.getItem("token");
-      await axios.delete(
-        `http://localhost:5000/clubs/${selectedClub.uid}/execs/${userUid}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+      await clubAPI.removeExec(selectedClub.uid, userUid);
       alert("Executive removed successfully");
       fetchMembers();
     } catch (err) {

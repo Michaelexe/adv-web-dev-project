@@ -1,5 +1,6 @@
 import React from "react";
 import { useTheme, PALETTES } from "../contexts/ThemeContext";
+import Navbar from "../components/Navbar";
 
 const LABELS = {
   system: "System (Auto)",
@@ -26,7 +27,6 @@ function Swatch() {
 
 export default function Settings() {
   const { palette, setPalette, cyclePalette } = useTheme();
-
   const handleKey = (e, p) => {
     if (e.key === "Enter" || e.key === " ") {
       e.preventDefault();
@@ -35,67 +35,74 @@ export default function Settings() {
   };
 
   return (
-    <div style={{ padding: 20 }}>
-      <h2>Appearance</h2>
-      <p>Choose a color palette for the app. Selection applies immediately.</p>
+    <>
+      <Navbar />
+      <div style={{ padding: 20 }}>
+        <h2>Appearance</h2>
+        <p>
+          Choose a color palette for the app. Selection applies immediately.
+        </p>
 
-      <div
-        role="listbox"
-        aria-label="Color palettes"
-        style={{ display: "flex", gap: 12, marginTop: 12 }}
-      >
-        {PALETTES.map((p) => (
+        <div
+          role="listbox"
+          aria-label="Color palettes"
+          style={{ display: "flex", gap: 12, marginTop: 12 }}
+        >
+          {PALETTES.map((p) => (
+            <button
+              key={p}
+              role="option"
+              aria-selected={palette === p}
+              tabIndex={0}
+              onClick={() => setPalette(p)}
+              onKeyDown={(e) => handleKey(e, p)}
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "flex-start",
+                padding: 12,
+                borderRadius: 8,
+                border:
+                  palette === p
+                    ? "2px solid var(--accent)"
+                    : "1px solid var(--muted)",
+                background: "var(--surface)",
+                color: "var(--on-background)",
+                cursor: "pointer",
+                minWidth: 160,
+              }}
+            >
+              <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+                <Swatch />
+                <div style={{ fontWeight: 700 }}>{LABELS[p]}</div>
+              </div>
+              <div
+                style={{ fontSize: 12, marginTop: 6, color: "var(--muted)" }}
+              >
+                {p}
+              </div>
+            </button>
+          ))}
+        </div>
+
+        <div style={{ marginTop: 18, display: "flex", gap: 12 }}>
+          <button onClick={() => cyclePalette()} className="btn-primary">
+            Cycle Palette
+          </button>
           <button
-            key={p}
-            role="option"
-            aria-selected={palette === p}
-            tabIndex={0}
-            onClick={() => setPalette(p)}
-            onKeyDown={(e) => handleKey(e, p)}
+            onClick={() => setPalette("dark")}
             style={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "flex-start",
-              padding: 12,
-              borderRadius: 8,
-              border:
-                palette === p
-                  ? "2px solid var(--accent)"
-                  : "1px solid var(--muted)",
-              background: "var(--surface)",
+              background: "transparent",
               color: "var(--on-background)",
-              cursor: "pointer",
-              minWidth: 160,
+              border: "1px solid var(--muted)",
+              padding: "8px 12px",
+              borderRadius: 8,
             }}
           >
-            <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
-              <Swatch />
-              <div style={{ fontWeight: 700 }}>{LABELS[p]}</div>
-            </div>
-            <div style={{ fontSize: 12, marginTop: 6, color: "var(--muted)" }}>
-              {p}
-            </div>
+            Reset to Dark
           </button>
-        ))}
+        </div>
       </div>
-
-      <div style={{ marginTop: 18, display: "flex", gap: 12 }}>
-        <button onClick={() => cyclePalette()} className="btn-primary">
-          Cycle Palette
-        </button>
-        <button
-          onClick={() => setPalette("dark")}
-          style={{
-            background: "transparent",
-            color: "var(--on-background)",
-            border: "1px solid var(--muted)",
-            padding: "8px 12px",
-            borderRadius: 8,
-          }}
-        >
-          Reset to Dark
-        </button>
-      </div>
-    </div>
+    </>
   );
 }

@@ -84,6 +84,8 @@ def create_event():
 
 @bp.route('/<event_uid>', methods=['GET'])
 def get_event(event_uid):
+    from flask_jwt_extended import verify_jwt_in_request, get_jwt_identity
+    
     event = Event.query.get(event_uid)
     if not event:
         return jsonify({'msg': 'event not found'}), 404
@@ -102,7 +104,23 @@ def get_event(event_uid):
     else:
         computed_status = 'upcoming'
 
-    return jsonify({'uid': event.uid, 'name': event.name, 'start_datetime': event.start_datetime.isoformat(), 'end_datetime': event.end_datetime.isoformat() if event.end_datetime else None, 'description': event.description, 'location': event.location, 'limit': event.limit, 'type': event.type, 'status': computed_status, 'club_uid': event.club_uid, 'club_name': club_name, 'club_icon': club_icon, 'banner_url': event.banner_url}), 200
+    # Try to get current user if authenticated
+    current_user_uid = None
+    try:
+        verify_jwt_in_request(optional=True)
+        current_user_uid = get_jwt_identity()
+    except:
+        pass
+    
+    # Check if current user is attending
+    is_attending = False
+    if current_user_uid:
+        is_attending = EventParticipant.query.filter_by(
+            event_uid=event_uid, 
+            user_uid=current_user_uid
+        ).first() is not None
+
+    return jsonify({'uid': event.uid, 'name': event.name, 'start_datetime': event.start_datetime.isoformat(), 'end_datetime': event.end_datetime.isoformat() if event.end_datetime else None, 'description': event.description, 'location': event.location, 'limit': event.limit, 'type': event.type, 'status': computed_status, 'club_uid': event.club_uid, 'club_name': club_name, 'club_icon': club_icon, 'banner_url': event.banner_url, 'is_attending': is_attending}), 200
 
 
 @bp.route('/<event_uid>', methods=['PUT'])
@@ -167,6 +185,24 @@ def join_event(event_uid):
     return jsonify({'msg': 'joined'}), 201
 
 
+@bp.route('/<event_uid>/leave', methods=['POST'])
+@jwt_required()
+def leave_event(event_uid):
+    uid = get_jwt_identity()
+    event = Event.query.get(event_uid)
+    if not event:
+        return jsonify({'msg': 'event not found'}), 404
+
+    # Find participation
+    participation = EventParticipant.query.filter_by(user_uid=uid, event_uid=event_uid).first()
+    if not participation:
+        return jsonify({'msg': 'not registered for this event'}), 400
+
+    db.session.delete(participation)
+    db.session.commit()
+    return jsonify({'msg': 'left event'}), 200
+
+
 @bp.route('/<event_uid>', methods=['DELETE'])
 @jwt_required()
 def delete_event(event_uid):
@@ -188,16 +224,34 @@ def delete_event(event_uid):
 @bp.route('/club/<club_uid>', methods=['GET'])
 def get_club_events(club_uid):
     """Get all events for a specific club"""
+    from flask_jwt_extended import get_jwt_identity, verify_jwt_in_request
+    
     club = Club.query.get(club_uid)
     if not club:
         return jsonify({'msg': 'club not found'}), 404
     
     events = Event.query.filter_by(club_uid=club_uid).order_by(Event.start_datetime.desc()).all()
     
+    # Try to get current user if authenticated
+    current_user_uid = None
+    try:
+        verify_jwt_in_request(optional=True)
+        current_user_uid = get_jwt_identity()
+    except:
+        pass
+    
     result = []
     for event in events:
         # Count participants
         participant_count = EventParticipant.query.filter_by(event_uid=event.uid).count()
+        
+        # Check if current user is attending
+        is_attending = False
+        if current_user_uid:
+            is_attending = EventParticipant.query.filter_by(
+                event_uid=event.uid, 
+                user_uid=current_user_uid
+            ).first() is not None
         
         result.append({
             'uid': event.uid,
@@ -211,7 +265,8 @@ def get_club_events(club_uid):
             'status': event.status,
             'club_uid': event.club_uid,
             'participant_count': participant_count,
-            'banner_url': event.banner_url
+            'banner_url': event.banner_url,
+            'is_attending': is_attending
         })
     
     return jsonify(result), 200

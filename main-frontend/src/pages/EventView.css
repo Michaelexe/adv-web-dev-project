@@ -62,6 +62,10 @@
   transition: all 0.3s ease;
 }
 
+.btn-join-event.joined {
+  background-color: color-mix(in srgb, var(--accent) 50%, black 50%);
+}
+
 .btn-join-event:hover:not(:disabled) {
   background-color: color-mix(in srgb, var(--accent) 75%, black 25%);
   transform: translateY(-2px);

@@ -131,8 +131,8 @@ body {
 }
 
 .status-scheduled {
-  background-color: rgba(0, 161, 255, 0.2);
-  color: var(--accent);
+  background-color: var(--accent);
+  color: var(--on-accent);
   border: 1px solid var(--accent);
 }
 

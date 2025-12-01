@@ -222,6 +222,8 @@ function ClubView() {
               <div className="events-grid">
                 {events.map((event) => {
                   const isUpcoming = event.status === "upcoming";
+                  const isAttending = event.is_attending;
+
                   if (isUpcoming) {
                     return (
                       <Link
@@ -231,11 +233,18 @@ function ClubView() {
                       >
                         <div className="event-card-header">
                           <h3>{event.name}</h3>
-                          <span
-                            className={`status-badge status-${event.status}`}
-                          >
-                            {event.status}
-                          </span>
+                          <div className="status-badges">
+                            <span
+                              className={`status-badge status-${event.status}`}
+                            >
+                              {event.status}
+                            </span>
+                            {isAttending && (
+                              <span className="status-badge status-attending">
+                                Attending
+                              </span>
+                            )}
+                          </div>
                         </div>
                         <div className="event-card-body">
                           <p className="event-info">
@@ -256,9 +265,18 @@ function ClubView() {
                     <div key={event.uid} className="event-card disabled">
                       <div className="event-card-header">
                         <h3>{event.name}</h3>
-                        <span className={`status-badge status-${event.status}`}>
-                          {event.status}
-                        </span>
+                        <div className="status-badges">
+                          <span
+                            className={`status-badge status-${event.status}`}
+                          >
+                            {event.status}
+                          </span>
+                          {isAttending && (
+                            <span className="status-badge status-attending">
+                              Attending
+                            </span>
+                          )}
+                        </div>
                       </div>
                       <div className="event-card-body">
                         <p className="event-info">
@@ -271,7 +289,7 @@ function ClubView() {
                           👥 {event.participant_count} participants
                         </p>
                       </div>
-                      <div className="status-overlay">{event.status}</div>
+                      {/* <div className="status-overlay">{event.status}</div> */}
                     </div>
                   );
                 })}

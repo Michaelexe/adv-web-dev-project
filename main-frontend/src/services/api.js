@@ -43,6 +43,7 @@ export const eventAPI = {
   getAll: () => api.get("/events/"),
   get: (uid) => api.get(`/events/${uid}`),
   join: (uid) => api.post(`/events/${uid}/join`),
+  leave: (uid) => api.post(`/events/${uid}/leave`),
   getClubEvents: (clubUid) => api.get(`/events/club/${clubUid}`),
 };
 

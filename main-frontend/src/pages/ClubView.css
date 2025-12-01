@@ -238,14 +238,27 @@
 .event-card-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   margin-bottom: 12px;
+}
+
+.status-badges {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: flex-end;
 }
 
 .event-card-header h3 {
   font-size: 18px;
   color: var(--on-background);
   margin: 0;
+}
+
+.status-attending {
+  background-color: var(--success);
+  color: var(--on-accent);
+  border: 1px solid var(--success);
 }
 
 .event-card-body {

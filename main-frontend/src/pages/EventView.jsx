@@ -12,7 +12,6 @@ function EventView() {
   const [comments, setComments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [joining, setJoining] = useState(false);
-  const [joined, setJoined] = useState(false);
   const [newComment, setNewComment] = useState("");
   const [replyTo, setReplyTo] = useState(null);
   const [replyContent, setReplyContent] = useState("");
@@ -37,13 +36,19 @@ function EventView() {
     }
   };
 
-  const handleJoin = async () => {
+  const handleJoinLeave = async () => {
     setJoining(true);
     try {
-      await eventAPI.join(eventUid);
-      setJoined(true);
+      if (event.is_attending) {
+        await eventAPI.leave(eventUid);
+      } else {
+        await eventAPI.join(eventUid);
+      }
+      // Refresh event data to get updated is_attending status
+      const eventResponse = await eventAPI.get(eventUid);
+      setEvent(eventResponse.data);
     } catch (err) {
-      alert(err.response?.data?.msg || "Failed to join event");
+      alert(err.response?.data?.msg || "Failed to update event registration");
     } finally {
       setJoining(false);
     }
@@ -228,9 +233,9 @@ function EventView() {
             {user &&
               (() => {
                 const isUpcoming = event.status === "upcoming";
-                const disabled = joining || joined || !isUpcoming;
-                const label = joined
-                  ? "✓ Joined"
+                const disabled = joining || !isUpcoming;
+                const label = event.is_attending
+                  ? "✓ Registered"
                   : joining
                   ? "Joining..."
                   : !isUpcoming
@@ -239,9 +244,11 @@ function EventView() {
 
                 return (
                   <button
-                    onClick={handleJoin}
+                    onClick={handleJoinLeave}
                     disabled={disabled}
-                    className="btn-join-event"
+                    className={`btn-join-event ${
+                      event.is_attending ? "joined" : ""
+                    }`}
                     title={
                       !isUpcoming
                         ? "Sign-ups are only open for upcoming events"

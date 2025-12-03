@@ -268,4 +268,5 @@ Diagnostics:
 [S.A.G.E Demo Video](https://youtu.be/8xzcq-jShMM)
 
 Main Page: https://sage-main.vercel.app/
+
 Club Executives Page: https://sage-clubs.vercel.app/

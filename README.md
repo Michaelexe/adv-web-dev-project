@@ -54,7 +54,6 @@ python -m pytest -q
 
 ```
 cd clubs-frontend
-npm ci
 npm run dev
 ```
 
@@ -62,7 +61,6 @@ npm run dev
 
 ```
 cd ../main-frontend
-npm ci
 npm run dev
 ```
 

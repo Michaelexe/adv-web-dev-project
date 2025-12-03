@@ -128,28 +128,94 @@ npm run dev
 
 ### Class Diagram
 
-```
+@startuml
+' Core backend domain model for S.A.G.E.
+
 class User {
-  +uuid String
-  +email String
-  +name String
-  +password_hash String
-  +is_active Boolean
+  +uuid: String
+  +email: String
+  +name: String
+  +password_hash: String
+  +is_active: Boolean
 }
-...
-```
+
+class Club {
+  +uid: String
+  +name: String
+  +description: String
+  +created_at: DateTime
+}
+
+class ClubMember {
+  +id: Integer
+  +user_uid: String
+  +club_uid: String
+  +role: String
+  +type: String  ' e.g., "exec" or "member"
+}
+
+class Event {
+  +uid: String
+  +club_uid: String
+  +title: String
+  +description: String
+  +start_time: DateTime
+  +end_time: DateTime
+}
+
+class Media {
+  +id: Integer
+  +url: String
+  +type: String
+  +owner_uid: String
+}
+
+' Relationships
+User "1" -- "0..*" ClubMember : has
+Club "1" -- "0..*" ClubMember : members
+Club "1" -- "0..*" Event : organizes
+User "1" -- "0..*" Event : creates
+User "1" -- "0..*" Media : uploads
+
+ClubMember o-- User : belongs_to
+ClubMember o-- Club : belongs_to
+
+@enduml
+
 
 ### Architecture Diagram
 
-```
 @startuml
+' High-level architecture for S.A.G.E.
+
 package "Frontends" {
-  package "clubs-frontend"
-  package "main-frontend"
+  package "clubs-frontend" #LightBlue {
+  }
+
+  package "main-frontend" #LightBlue {
+  }
 }
-...
+
+package "Backend" {
+  package "Flask API" as API #LightGreen {
+  }
+
+  node "Database (SQLAlchemy)" as DB #LightYellow
+}
+
+package "External Services" {
+  node "Cloudinary (media)" #Orange
+}
+
+' Relationships
+clubs-frontend --> API : REST\n(auth, clubs, events, media)
+main-frontend --> API : REST\n(auth, events, clubs)
+
+API --> DB : SQLAlchemy ORM
+API --> "Cloudinary (media)" : Upload/Fetch media
+
 @enduml
-```
+
 
 ## PageSpeed Insights
 
